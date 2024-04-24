@@ -3,23 +3,18 @@ from transformers import BertTokenizer, BertModel
 import faiss
 import os
 import json
-import time
-
 os.environ['TRANSFORMERS_CACHE'] = '/home/hk_cache'
 tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
 model = BertModel.from_pretrained('bert-base-chinese')
-model = model.to("cuda")
-
 
 def bert_vectorize(texts):
     # 编码文本
     encoded_input = tokenizer(texts, padding=True, truncation=True, return_tensors='pt')
-    encoded_input = encoded_input.to("cuda")
     # 获取BERT模型的输出
     with torch.no_grad():
         model_output = model(**encoded_input)
     # 提取[CLS]标记的输出作为句子的向量表示
-    sentence_embeddings = model_output.last_hidden_state[:, 0, :].to("cpu").numpy()
+    sentence_embeddings = model_output.last_hidden_state[:, 0, :].numpy()
     return sentence_embeddings
 
 def get_dic_data(path):
